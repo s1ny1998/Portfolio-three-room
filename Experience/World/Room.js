@@ -1,6 +1,7 @@
 import Experience from "../Experience"
 import * as THREE from "three";
 import GSAP from "gsap";
+import {RectAreaLightHelper} from "three/examples/jsm/helpers/RectAreaLightHelper";
 
 export default class Room {
     constructor() {
@@ -12,14 +13,11 @@ export default class Room {
         this.room = this.resources.items.room;
         this.actualRoom = this.room.scene;
 
-
-
         this.lerp = {
-            current : 0,
-            target : 0,
-            ease : 0.1,
+            current: 0,
+            target: 0,
+            ease: 0.1,
         };
-
 
         this.setModel();
         this.setAnimation();
@@ -28,12 +26,12 @@ export default class Room {
 
     }
 
-    setModel(){
+    setModel() {
         this.actualRoom.children.forEach(child => {
             child.castShadow = true;
             child.recieveShadow = true;
 
-            if(child instanceof THREE.Group){
+            if (child instanceof THREE.Group) {
                 child.children.forEach((groupChild) => {
                     groupChild.castShadow = true;
                     groupChild.receiveShadow = true;
@@ -59,11 +57,24 @@ export default class Room {
             }
         });
 
+        const width = 0.5;
+        const height = 0.7;
+        const intensity = 1;
+        const rectLight = new THREE.RectAreaLight(0xffffff, intensity, width, height);
+        rectLight.position.set(7.68244, 7, 0.5);
+        rectLight.rotation.x = -Math.PI / 2;
+        rectLight.rotation.z = Math.PI / 4;
+        this.actualRoom.add(rectLight)
+
+        // const rectLightHelper = new RectAreaLightHelper(rectLight);
+        // rectLight.add(rectLightHelper);
+
         this.scene.add(this.actualRoom);
-        this.actualRoom.scale.set(0.11, 0.11, 0.11)
+        this.actualRoom.scale.set(0.11, 0.11, 0.11);
+
     }
 
-    setAnimation(){
+    setAnimation() {
         this.mixer = new THREE.AnimationMixer(this.actualRoom);
         this.swim = this.mixer.clipAction(this.room.animations[5]);
         this.swim.play();
@@ -72,13 +83,13 @@ export default class Room {
     onMouseMove() {
         window.addEventListener("mousemove", (e) => {
             // 0 > 694
-            this.rotation = ( e.clientX - window.innerWidth / 2)* 2 /window.innerWidth;
+            this.rotation = (e.clientX - window.innerWidth / 2) * 2 / window.innerWidth;
             this.lerp.target = this.rotation * 0.1;
         });
     }
 
     resize() {
-       
+
     }
 
     update() {
